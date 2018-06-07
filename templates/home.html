@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container mt-3">
+        <h1>Welcome to Experimentor.io</h1>
+        <div class="row">
+            <div class="col-md-6">&nbsp;</div>
+            <div class="col-md-6">
+                <div class="row justify-content-center">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">Sign up</h3>
+                            <form method="post" novalidate>
+                                {% csrf_token %}
+                                {% include 'includes/form.html' %}
+                                <button type="submit" class="btn btn-primary btn-block">Create an account</button>
+                            </form>
+                        </div>
+                        <div class="card-footer text-muted text-center">
+                            Already have an account? <a href="{% url 'login' %}">Log in</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

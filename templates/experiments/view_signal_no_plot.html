@@ -1,0 +1,32 @@
+{% extends 'login_base.html' %}
+{% block account_content %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'account' user.username %}">{{ user.username }}</a></li>
+        <li class="breadcrumb-item"><a
+                href="{% url 'experiment' user.username experiment.slug %}">{{ experiment.name }}</a></li>
+        <li class="breadcrumb-item active">{{ signal.name }}</li>
+    </ol>
+
+    <div class="container">
+        <div class="row my-3">
+            <div class="col">
+                <h2>List of recorded values</h2>
+                <table class="table" style="background: white;">
+                    <thead>
+                    <tr>
+                        <th scope="col">Time</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                    </thead>
+                    {% for measurement in signal.measurements.all %}
+                        <tr>
+                            <td>{{ measurement.updated_time }}</td>
+                            <td>{{ measurement.value }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

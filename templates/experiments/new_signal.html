@@ -1,0 +1,44 @@
+{% extends 'login_base.html' %}
+
+{% block account_content %}
+    <h1>Create Signal for {{ experiment.name }}</h1>
+    <small>Signals are the parameters to be recorded while running an experiment.</small>
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col mb-5">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Signal</th>
+                        <th scope="col">Last Updated</th>
+                        <th scope="col">Last Value</th>
+                    </tr>
+                    </thead>
+                    {% for signal in experiment.signals.all %}
+                        <tr>
+                            <td>{{ signal.name }}</td>
+                            <td>{{ signal.updated_time }}</td>
+                            <td>{{ signal.last_value }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        Creating a new signal
+                    </div>
+                    <div class="card-body">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            {% include 'includes/form.html' %}
+                            <button class="btn" type="submit">Create New Signal</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

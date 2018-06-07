@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <div class="container-fluid">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                {{ message }}
+            </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-sm-2 col-md-2 col-lg-1 col-xl-1">
+                <nav class="navbar navbar-light navbar-expand-sm px-0 flex-row flex-nowrap">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarWEX"
+                            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="navbar-collapse collapse" id="navbarWEX">
+                        <div class="nav flex-sm-column flex-row">
+                            <a href="{% url 'account' user.username %}" class="nav-item nav-link active">Home</a>
+                            <a href="{% url 'profile' user.username %}" class="nav-item nav-link">Profile</a>
+                            <a href="{% url 'experiments' user.username %}" class="nav-item nav-link">Experiments</a>
+                            <a href="#" class="nav-item nav-link">Contact</a>
+                            <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div class="col py-4 ml-3">
+                {% block account_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock body %}

@@ -1,0 +1,24 @@
+{% extends 'login_base.html' %}
+
+{% block account_content %}
+    <h1>Create New Experiment</h1>
+    <small>Experiments are the base building blocks for storing your data.</small>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        Creating new experiment
+                    </div>
+                    <div class="card-body">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            {% include 'includes/form.html' %}
+                            <button class="btn" type="submit">Create New Experiment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
