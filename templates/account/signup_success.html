@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}
+    Sign Up successful | {{ SITENAME }}
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <h1 class="text-center logo my-4">
+            <a href="{% url 'home' %}">{{ SITENAME }}</a>
+        </h1>
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            Thank you for signing up. You have to verify your e-mail address before continuing. <br />
+                            If you don't find the e-mail, check your spam folder.
+                        </div>
+                        <a href="{% url 'home' %}" class="btn btn-block btn-light">Return to home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

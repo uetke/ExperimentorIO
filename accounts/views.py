@@ -4,10 +4,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.views import generic, View
 from django.contrib import messages
 
 from accounts.models import Profile
+from accounts.token import account_activation_token
 from experimentor.models import Experiment
 
 from .forms import SignUpForm, ProfileUpdateForm
@@ -26,9 +29,11 @@ class LoginView(LoginView):
 
 class SignUp(generic.CreateView):
     form_class = SignUpForm
-    success_url = reverse_lazy('login')
+    success_url = reverse_lazy('signup_success')
     template_name = 'signup.html'
 
+class SignUpSuccess(generic.TemplateView):
+    template_name = 'account/signup_success.html'
 
 class AccountView(LoginRequiredMixin, View):
     context_object_name = 'experiments'
@@ -93,3 +98,21 @@ def profile_view(request, username):
         else:
 
             return render(request, 'account/profile.html', {'form': form})
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.profile.verified_email = True
+        user.profile.save()
+        user.save()
+        messages.success(request, 'Email verified')
+        return redirect('home')
+    else:
+        return render(request, 'account/activation_invalid.html')

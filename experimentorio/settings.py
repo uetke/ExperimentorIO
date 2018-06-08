@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'widget_tweaks',
     'rest_framework',
+    'django_crontab',
+    'channels',
+    'example_channels',
 ]
 
 MIDDLEWARE = [
@@ -148,3 +151,8 @@ MESSAGE_TAGS = {
 
 MESSAGE_LEVEL = 10  # Debug
 
+CRONJOBS = [
+    ('*/5 * * * *', 'experimentorio.cron.update_size')
+]
+
+ASGI_APPLICATION = 'experimentorio.routing.application'

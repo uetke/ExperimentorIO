@@ -13,22 +13,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th scope="col">Signal</th>
-                        <th scope="col">Last Updated</th>
-                        <th scope="col">Last Value</th>
-                    </tr>
-                    </thead>
-                    {% for signal in experiment.signals.all %}
-                        <tr>
-                            <td><a href="{% url 'signal' user.username experiment.slug signal.slug %}">{{ signal.name }}</a></td>
-                            <td>{{ signal.updated_time }}</td>
-                            <td>{{ signal.last_value }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
+                {% include 'experiments/includes/signals_table.html' %}
             </div>
         </div>
         <div class="row">

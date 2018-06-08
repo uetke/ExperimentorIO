@@ -29,5 +29,13 @@ class ProfileUpdateForm(forms.ModelForm):
                   'website', 'workplace', 'public']
 
         help_texts = {
-            'public': 'Make your profile available to other logged in users'
+            'public': 'Make your profile available to other logged in users',
+            'bio': 'You can use markdown to style your profile'
         }
+
+        widgets = {
+            'public': forms.CheckboxInput(attrs={'data-toggle': 'toggle', 'class': 'switch'}),
+            'bio': forms.Textarea(attrs={'rows': 4})
+        }
+
+

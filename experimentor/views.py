@@ -3,6 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib import messages
 import json
+
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView
@@ -75,12 +77,19 @@ def signal_view(request, username, experiment_slug, signal_slug):
     signal = Signal.objects.get(experiment=experiment, slug=signal_slug)
     measurements = Measurement.objects.filter(signal=signal).order_by('-updated_time')[:100]
 
-    if not signal.value_type in (Signal.FLOAT, Signal.INTEGER):
+    if signal.value_type not in (Signal.FLOAT, Signal.INTEGER, Signal.ARRAY):
         return render(request, 'experiments/view_signal_no_plot.html', {'signal': signal, 'experiment': experiment})
 
-    data = []
-    for m in measurements:
-        data.append([m.updated_time.timestamp()*1000, float(m.value)])
+    if signal.value_type == Signal.ARRAY:
+        data = signal.measurements.last().value
+        data = json.loads(data)
+    else:
+        data = []
+        for m in measurements:
+            try:
+                data.append([m.updated_time.timestamp()*1000, float(m.value)])
+            except:
+                pass
 
     y_label = signal.name
     if signal.units:
@@ -91,7 +100,8 @@ def signal_view(request, username, experiment_slug, signal_slug):
         'title': json.dumps(experiment.name + ' / ' + signal.name),
         'y_label': json.dumps(y_label),
         'data_y': json.dumps(data),
-        'experiment': experiment
+        'experiment': experiment,
+        # 'data': data,
     })
 
 
@@ -104,3 +114,29 @@ class UpdateExperiment(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         experiment = Experiment.objects.get(pk=self.kwargs['pk'])
         return experiment
+
+
+class IsOwnerOrPublic:
+    """
+        Checks that the current user is the owner of the element, or that it is public.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        if request.user == obj.owner or obj.visibility == 2:
+            return super(IsOwnerOrPublic, self).dispatch(
+                request, *args, **kwargs)
+
+        raise PermissionDenied
+
+class ExperimentView(LoginRequiredMixin, IsOwnerOrPublic, DetailView):
+    model = Experiment
+    context_object_name = 'experiment'
+    template_name = 'experiments/experiment.html'
+
+    def get_object(self, queryset=None):
+        user = User.objects.get(username=self.kwargs['username'])
+        experiment = Experiment.objects.get(owner=user, slug=self.kwargs['experiment_slug'])
+        return experiment
+
+

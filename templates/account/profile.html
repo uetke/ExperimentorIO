@@ -1,4 +1,12 @@
 {% extends 'login_base.html' %}
+{% load static %}
+{% block meta_header %}
+    <link href="{% static 'css/bootstrap-toggle.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block footer_scripts %}
+    <script src="{% static 'js/bootstrap-toggle.min.js' %}"></script>
+{% endblock %}
+
 {% block account_content %}
     <div class="container">
         <h1>Profile</h1>

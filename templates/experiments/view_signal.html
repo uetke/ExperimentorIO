@@ -1,4 +1,5 @@
 {% extends 'login_base.html' %}
+{% load timetags %}
 {% block footer_scripts %}
     <script src="https://code.highcharts.com/highcharts.src.js"></script>
     <!--javascript for charts
@@ -53,10 +54,10 @@
                         <th scope="col">Value</th>
                     </tr>
                     </thead>
-                    {% for measurement in signal.measurements.all %}
+                    {% for measurement in data %}
                         <tr>
-                            <td>{{ measurement.updated_time }}</td>
-                            <td>{{ measurement.value }}</td>
+                            <td>{{ measurement.0|make_date }}</td>
+                            <td>{{ measurement.1 }}</td>
                         </tr>
                     {% endfor %}
                 </table>

@@ -5,10 +5,13 @@ import jwt
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from django.template.loader import render_to_string
 from django.utils import six
 from django.utils.crypto import salted_hmac, constant_time_compare
-from django.utils.http import int_to_base36, base36_to_int
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import int_to_base36, base36_to_int, urlsafe_base64_encode
 
+from accounts.token import account_activation_token
 from experimentorio.settings import SECRET_KEY
 
 
@@ -61,6 +64,8 @@ class Account(models.Model):
     user = models.OneToOneField(User, related_name='account', on_delete=models.CASCADE)
     api_key = models.CharField(max_length=250, null=False, unique=True)
     member_type = models.PositiveIntegerField(choices=MEMBER_TYPES, default=BETA_TESTER)
+    expiration_date = models.DateTimeField(null=True)
+    data_size = models.PositiveIntegerField(default=0, null=False)
 
     def make_api_key(self, timestamp):
         key_salt = SECRET_KEY
@@ -96,6 +101,7 @@ def create_profile(sender, **kwargs):
         user_profile = Profile(user=user)
         user_profile.save()
 
+
 def create_account(sender, **kwargs):
     user = kwargs['instance']
     if kwargs['created']:
@@ -103,5 +109,18 @@ def create_account(sender, **kwargs):
         user_account.save()
 
 
+def send_verification_email(sender, instance, created, **kwargs):
+    if created:
+        subject = 'Activate your e-mail'
+        message = render_to_string('account/activate_email.html', {
+            'user': instance,
+            'domain': 'http://localhost:8000',
+            'uid': force_text(urlsafe_base64_encode(force_bytes(instance.pk))),
+            'token': account_activation_token.make_token(instance)
+        })
+        instance.email_user(subject, message)
+
+
 post_save.connect(create_profile, sender=User)
 post_save.connect(create_account, sender=User)
+post_save.connect(send_verification_email, sender=User)

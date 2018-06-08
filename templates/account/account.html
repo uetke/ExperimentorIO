@@ -2,7 +2,7 @@
 
 {% block account_content %}
     <div class="row justify-content-center">
-        <div class="col-sm-12 col-md-6">
+        <div class="col-sm-10 col-md-4">
             <div class="card  border-secondary">
                 <div class="card-header">
                     Account Information
@@ -12,37 +12,57 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">API Key: {{ user.account.api_key }}</li>
                         <li class="list-group-item">Account type: {{ user.account.get_member_type_display }}</li>
+                        <li class="list-group-item">E-mail verified: {{ user.profile.verified_email }}</li>
+                        <li class="list-group-item">Public Profile: {{ user.profile.public }}</li>
+                        <li class="list-group-item">Account Expiration: {{ user.account.expiration_date }}</li>
+                        <li class="list-group-item">Account size: {{ user.account.data_size }} bytes</li>
                     </ul>
                 </div>
             </div>
         </div>
-    </div>
-    <h1>Latest Experiments</h1>
-    {% if experiments %}
-        <table class="table table-hover">
-            <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Last Updated</th>
-                <th scope="col">Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for experiment in experiments %}
-                <tr>
-                    <td><a href="{% url 'experiment' user.username experiment.slug %}">{{ experiment.name }}</a></td>
-                    <td>{{ experiment.update_date }}</td>
-                    <td><span class="badge badge-{{ experiment.status_tag }}">{{ experiment.get_status_display }}</span></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>You have no experiments created yet.<p>
-    {% endif %}
-    <div class="row">
-        <div class="col">
-            <a href="{% url 'new_experiment' %}"><button class="btn">Create New Experiment</button></a>
+        <div class="col-sm-12 col-md-4">
+            <div class="card border-secondary">
+                <div class="card-header">Experiments information</div>
+
+                <div class="card-body">
+                    <h3 class="card-title">Latest Experiments</h3>
+                    {% if experiments %}
+                        <table class="table table-hover" style="background: white;">
+                            <thead>
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Last Updated</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for experiment in experiments %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'experiment' user.username experiment.slug %}">{{ experiment.name }}</a>
+                                    </td>
+                                    <td>{{ experiment.update_date }}</td>
+                                    <td><span
+                                            class="badge badge-{{ experiment.status_tag }}">{{ experiment.get_status_display }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>You have no experiments created yet.<p>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col">
+                            <a href="{% url 'new_experiment' %}">
+                                <button class="btn btn-block btn-primary">Create New Experiment</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
+
 {% endblock %}

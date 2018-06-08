@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}
+    E-mail activation invalid | {{ SITENAME }}
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <h1 class="text-center logo my-4">
+            <a href="{% url 'home' %}">{{ SITENAME }}</a>
+        </h1>
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10 col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            Your e-mail couldn't be verified.
+                        </div>
+                        <a href="{% url 'home' %}" class="btn btn-block btn-light">Return to home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

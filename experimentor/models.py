@@ -1,11 +1,9 @@
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models.functions import datetime
-from django.db.models.signals import post_save
-from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.timezone import now
+
 
 class Experiment(models.Model):
     PRIVATE = 1
@@ -43,8 +41,8 @@ class Experiment(models.Model):
     status = models.PositiveIntegerField(choices=STATUS_CHOICES, default=STOPPED, validators=[MaxValueValidator(4)])
     slug = models.CharField(max_length=140, null=True)
 
-    def get_absolute_url(self):
-        return reverse('experiment', kwargs={'username': self.owner.username, 'experiment_slug': self.slug})
+    # def get_absolute_url(self):
+    #     return reverse('experiment', kwargs={'username': self.owner.username, 'experiment_slug': self.slug})
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -82,13 +80,17 @@ class Signal(models.Model):
     FLOAT = 3
     INTEGER = 4
     STATUS = 5
+    ARRAY = 6  # 1D Array
+    ARRAY2 = 7  # 2D Array
 
     TYPE_CHOICES = (
         (STRING, 'string'),
         (BOOL, 'bool'),
         (FLOAT, 'float'),
         (INTEGER, 'integer'),
-        (STATUS, 'status')
+        (STATUS, 'status'),
+        (ARRAY, '1D array'),
+        (ARRAY2, '2D array')
     )
 
     experiment = models.ForeignKey(Experiment, on_delete=models.CASCADE, related_name='signals', null=False)
@@ -114,9 +116,10 @@ class Signal(models.Model):
                 new_slug = base_slug + '-{}'.format(i)
                 i += 1
             self.slug = new_slug
+        super(Signal, self).save(*args, **kwargs)
         self.experiment.update_date = self.updated_time
         self.experiment.save()
-        super(Signal, self).save(*args, **kwargs)
+
 
     @classmethod
     def get_from_user_experiment_slug(cls, username, experiment_slug, slug):
@@ -139,9 +142,9 @@ class Measurement(models.Model):
 
     def save(self, *args, **kwargs):
         super(Measurement, self).save(*args, **kwargs)
-        print(self.updated_time)
         self.signal.updated_time = self.updated_time
         self.signal.save()
+
 
 def last_update(sender, *args, **kwargs):
     if kwargs['created']:

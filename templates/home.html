@@ -9,7 +9,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h3 class="card-title">Sign up</h3>
-                            <form method="post" novalidate>
+                            <form method="post" novalidate action="{% url 'signup' %}">
                                 {% csrf_token %}
                                 {% include 'includes/form.html' %}
                                 <button type="submit" class="btn btn-primary btn-block">Create an account</button>
@@ -23,5 +23,7 @@
                 </div>
             </div>
         </div>
+        <input type="checkbox" data-toggle="toggle" class="switch" id="switch-id">
     </div>
+
 {% endblock %}
