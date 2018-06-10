@@ -1,8 +1,10 @@
+import channels.layers
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils.text import slugify
 from django.utils.timezone import now
+from asgiref.sync import async_to_sync
 
 
 class Experiment(models.Model):
@@ -120,13 +122,11 @@ class Signal(models.Model):
         self.experiment.update_date = self.updated_time
         self.experiment.save()
 
-
     @classmethod
     def get_from_user_experiment_slug(cls, username, experiment_slug, slug):
         user = User.objects.get(username=username)
         experiment = Experiment.objects.get(owner=user, slug=experiment_slug)
         return cls.objects.get(experiment=experiment, slug=slug)
-
 
     def __str__(self):
         if self.slug:
@@ -144,6 +144,11 @@ class Measurement(models.Model):
         super(Measurement, self).save(*args, **kwargs)
         self.signal.updated_time = self.updated_time
         self.signal.save()
+        channel_layer = channels.layers.get_channel_layer()
+        data = {'type': 'chat_message',
+                'y': self.value,
+                'x': self.updated_time.timestamp()*1000}
+        async_to_sync(channel_layer.group_send)("chat_aqui", data)
 
 
 def last_update(sender, *args, **kwargs):

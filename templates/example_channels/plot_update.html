@@ -1,0 +1,78 @@
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script>
+
+
+
+    Highcharts.setOptions({
+        global: {
+            useUTC: false
+        }
+    });
+
+
+    Highcharts.chart('container', {
+        chart: {
+            type: 'spline',
+            animation: Highcharts.svg, // don't animate in old IE
+            marginRight: 10,
+            events: {
+                load: function () {
+                    var series = this.series[0];
+                    console.log('Loading socket');
+                    var roomName = {{ room_name_json }};
+                    var chatSocket = new WebSocket(
+                        'ws://' + window.location.host +
+                        '/ws/chat/' + roomName + '/');
+
+                    chatSocket.onmessage = function (e) {
+                        console.log('Got message');
+                        console.log(e);
+                        var data = JSON.parse(e.data);
+                        var x = data['x'];
+                        var y = data['y'];
+                        console.log(x);
+                        console.log(y);
+
+                        series.addPoint([y], true, true);
+                    };
+                }
+            }
+        },
+        title: {
+            text: 'Live random data'
+        },
+        yAxis: {
+            title: {
+                text: 'Value'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.series.name + '</b><br/>' +
+                    Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                    Highcharts.numberFormat(this.y, 2);
+            }
+        },
+        legend: {
+            enabled: false
+        },
+        exporting: {
+            enabled: false
+        },
+        series: [{
+            name: 'Random data',
+            data: [0]
+        }]
+    });
+</script>
