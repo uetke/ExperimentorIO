@@ -10,7 +10,7 @@ channels-redis==2.2.1
 chardet==3.0.4
 constantly==15.1.0
 daphne==2.1.2
-Django==2.0.12
+Django==2.2.13
 django-crontab==0.7.1
 django-widget-tweaks==1.4.2
 djangorestframework==3.10.3
